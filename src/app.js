@@ -9,17 +9,29 @@ app.use("/test",(req,res) => {
     res.send("Hello from the server");
 });
 
-app.use("/hello/2", (req, res) => {
-    res.send("Abrakadabra");
+
+
+app.get("/user", (req, res) => {
+    res.send({firstName:"Anurag", lastName:"Kumar"});
 });
 
-app.use("/hello", (req, res) => {
-    res.send("Hello Hello Hello");
+app.post("/user", (req, res) => {
+    //console.log("Saved data to the database");
+    res.send("Data successfully saved to the database");
 });
 
-app.use("/",(req,res) => {
-    res.send("Namaste from the dashboard");
+app.delete("/user", (req, res) => {
+    //console.log("data deleted from the database");
+    res.send("Data successfully deleted from the database");
 });
+
+app.use("/user",(req,res) => {
+    res.send("HAHAHAHAHA");
+});
+
+// app.use("/",(req,res) => {
+//     res.send("Namaste from the dashboard");
+// });
 
 app.listen(7777, () => {
     console.log("My server is sucessfully listening on port 7777...");
