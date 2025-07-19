@@ -5,23 +5,23 @@ const express = require('express');
 
 const app = express();
 
-app.use("/test",(req,res) => {
-    res.send("Hello from the server");
-});
+// app.use("/test",(req,res) => {
+//     res.send("Hello from the server");
+// });
 
 
-app.get(/.*fly$/, (req, res) => {
-    res.send({firstName:"Anurag", lastName:"Kumar"});
-});
+// app.get(/.*fly$/, (req, res) => {
+//     res.send({firstName:"Anurag", lastName:"Kumar"});
+// });
 
-//Dynamic route and req.params to get the parameters 
+// //Dynamic route and req.params to get the parameters 
 
-app.get("/user/:userId/:name/:password", (req, res) => {
+// app.get("/user/:userId/:name/:password", (req, res) => {
     
-    const obj = JSON.parse(JSON.stringify(req.params)); // if we do this then the response that is returned from the req.parmas will be a JS object
-    console.log(obj);
-    res.send({firstName:"Anurag", lastName:"Kumar"});
-});
+//     const obj = JSON.parse(JSON.stringify(req.params)); // if we do this then the response that is returned from the req.parmas will be a JS object
+//     console.log(obj);
+//     res.send({firstName:"Anurag", lastName:"Kumar"});
+// });
 
 // req.query to get the queries
 
@@ -63,6 +63,29 @@ app.get("/user/:userId/:name/:password", (req, res) => {
 // });
 
 //Playing more with routes i.e advanced concept
+
+app.use("/user", (req, res, next) => {
+    console.log("Handeling route user");
+    // res.send("Resonse 1");
+    next();
+
+},
+(req, res, next) => {
+    console.log("Handeling route user 2");
+    // res.send("Resonse 2");
+    next();
+},
+(req, res, next) => {
+    console.log("Handeling route user 3");
+    // res.send("Resonse 3");
+    next();
+},
+(req, res, next) => {
+    console.log("Handeling route user 4");
+    // res.send("Resonse 4");
+    next();
+},
+);
 
 app.listen(7777, () => {
     console.log("My server is sucessfully listening on port 7777...");
