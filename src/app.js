@@ -25,6 +25,25 @@ app.get("/user", userAuth, (req, res) => {
          
 });
 
+app.use("/getUserData", (req, res) => {
+        //Logic to DB to get some data
+        try{
+                throw new Error("something something...");
+                res.send("Data sent successfully");
+        }
+        catch(err){
+                //console.log(err);
+                res.status(500).send("There is error in the code");
+        }
+});
+
+app.use("/", ( req, res, next) => {
+        if(err){
+                
+                res.status(500).send("Something went wrong");
+        }
+})
+
 app.listen(7777, () => {
     console.log("My server is sucessfully listening on port 7777...");
 });
