@@ -6,17 +6,13 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
 
+app.use(express.json());
+
 //creating a POST api to write data into the database   
 app.post("/signUp", async (req, res) => {
-
-    //creating new instace i.e document of the User model
-    const user = new User({
-        firstName:"Sachin",
-        lastName:"Tendulkar",
-        emailId: "sachin@tendulkar.com",
-        password: "sachin@123",
     
-    });
+    //creating new instace i.e document of the User model
+    const user = new User(req.body);
 
     try {
         await user.save();
