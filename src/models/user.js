@@ -2,24 +2,48 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
     firstName: {
-        type: String
+        type: String,
+        required: true,
     },
     lastName: {
-        type: String
+        type: String,
     },
     emailId: {
-        type: String
+        type: String,
+        lowercase: true,
+        required: true,
+        unique: true,
+        trim: true,
     },
     password: {
-        type: String
+        type: String,
+        required: true,
     },
     age: {
-        type: Number
+        type: Number,
     },
     gender: {
-        type: String
-    }
-
+        type: String,
+        lowercase: true,
+        validate(value) {
+            if(!["male","female","others"].includes(value)){
+                throw new Error("Gender data not valid");
+            }
+        }
+    },
+    photoUrl: {
+        type: String,
+        default: "geographyandyou.com/images/user-profile.png"
+    },
+    about: {
+        type: String,
+        default: "This is a default user "
+    },
+    skills: {
+        type: [String],
+    },
+},{
+    timestamps: true,
 });
 
 // const User = mongoose.model("User", userSchema);
@@ -27,4 +51,3 @@ const userSchema = new mongoose.Schema({
 // or we can directly export this model
 
 module.exports = mongoose.model("User", userSchema);
-

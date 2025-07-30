@@ -109,12 +109,14 @@ app.patch("/user", async (req, res) => {
     try{
         // const user = await User.findByIdAndUpdate({_id : userId}, data);
         // OR
-         const user = await User.findOneAndUpdate({emailId: userEmailId }, data, {returnDocument: "after"});
+         const user = await User.findOneAndUpdate({emailId: userEmailId }, data, {
+            returnDocument: "after",
+        runValidators: true});
          console.log(user);
         res.send("User data updated successfully");
     }
     catch(err){
-        res.status(400).send("Something went wrong");
+        res.status(400).send("UPDATE FAILED : " + err.message);
     }
 
 });
