@@ -107,6 +107,18 @@ app.patch("/user", async (req, res) => {
     // console.log(data);
 
     try{
+
+        const ALLOWED_UPDATES = ["userId", "photoUrl", "about", "gender", "skills"];
+
+        const isUpdateAllowed = Object.keys(data).every((k) => 
+            ALLOWED_UPDATES.includes(k)
+        )
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed");
+        }
+        if(data?.skills.length > 10){
+            throw new Error("Skills cannot be more than 10");
+        }
         // const user = await User.findByIdAndUpdate({_id : userId}, data);
         // OR
          const user = await User.findOneAndUpdate({emailId: userEmailId }, data, {
