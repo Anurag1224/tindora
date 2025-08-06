@@ -6,9 +6,13 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const app = express();
+const {userAuth} = require("./middlewares/auth");
 
 app.use(express.json());
+app.use(cookieParser());
 
 //creating a POST api to write data into the database
 app.post("/signUp", async (req, res) => {
@@ -50,6 +54,13 @@ app.post("/signin", async (req, res) => {
         //if email exists then check for password whether it is correct or not
         isPasswordValid = await bcrypt.compare(password, user.password);
         if(isPasswordValid){
+            //create a JWT token 
+            const token = await jwt.sign({_id : user._id}, "Anurag@123$");
+
+            //add the token into cookie and send the response back to the user
+
+            res.cookie("token" , token)
+        
             res.send("Login sucessfully !!!")
         }
         else{
@@ -59,6 +70,41 @@ app.post("/signin", async (req, res) => {
     catch(err) {
         res.status(400).send("ERROR : " +   err.message)
     }
+});
+
+//Profile API
+
+app.get("/profile", userAuth, async (req, res) => {
+
+  try{  
+    
+  const cookies = req.cookies ;
+
+  // extract token from cookies
+  const {token} = cookies;
+
+  if(!token){
+    throw new Error("Invalid token");
+  }
+
+  //validate this token 
+
+  const decodedMessage = await jwt.verify(token ,"Anurag@123$" );
+
+  const {_id} = decodedMessage;
+
+  const user = await User.findById(_id);
+
+  if(!user){
+    throw new Error("User doesn't exist"); 
+  }
+
+  res.send("User Profile" + user); 
+  }
+  catch (err) {
+    res.status(400).send("ERROR : " + err.message)
+  }
+
 });
 
 //Feed API - GET /feed - to get all the users from the database
