@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const app = express();
-const {userAuth} = require("./middlewares/auth");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -43,49 +43,45 @@ app.post("/signUp", async (req, res) => {
 });
 
 app.post("/signin", async (req, res) => {
-    try{
-        const {emailId, password} = req.body;
-        //first check whether the email id exists in the DB or not
-        const user = await User.findOne({emailId: emailId});
-        if(!user) {
-            throw new Error("Invalid Credentials !");
-        }
-
-        //if email exists then check for password whether it is correct or not
-        isPasswordValid = await bcrypt.compare(password, user.password);
-        if(isPasswordValid){
-            //create a JWT token 
-            const token = await jwt.sign({_id : user._id}, "Anurag@123$", {expiresIn:"1d"});
-
-            //add the token into cookie and send the response back to the user
-
-            res.cookie("token" , token ,{expires: new Date(Date.now() + 1 * 3600000)}); //cookie expires in 1 hour
-        
-            res.send("Login sucessfully !!!")
-        }
-        else{
-            throw new Error("Invalid Credentials !")
-        }
+  try {
+    const { emailId, password } = req.body;
+    //first check whether the email id exists in the DB or not
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials !");
     }
-    catch(err) {
-        res.status(400).send("ERROR : " +   err.message)
+
+    //if email exists then check for password whether it is correct or not
+    isPasswordValid = await user.validatePassword(password);
+    if (isPasswordValid) {
+      //create a JWT token
+      const token = await user.getJWT();
+
+      //add the token into cookie and send the response back to the user
+
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 1 * 3600000),
+      }); //cookie expires in 1 hour
+
+      res.send("Login sucessfully !!!");
+    } else {
+      throw new Error("Invalid Credentials !");
     }
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
 });
 
 //Profile API
 
 app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
 
-  try{  
-
-  const user = req.user;
-
-  res.send("User Profile" + user); 
+    res.send("User Profile" + user);
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
   }
-  catch (err) {
-    res.status(400).send("ERROR : " + err.message)
-  }
-
 });
 
 //Feed API - GET /feed - to get all the users from the database
@@ -196,14 +192,13 @@ app.delete("/user", async (req, res) => {
 });
 
 app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-    
   const user = req.user;
 
-  //sending a connection request 
-    console.log("Sending connection request");
+  //sending a connection request
+  console.log("Sending connection request");
 
-    res.send(user.firstName + " has sent the connection Request")
-} )
+  res.send(user.firstName + " has sent the connection Request");
+});
 
 connectDB()
   .then(() => {
