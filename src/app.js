@@ -55,11 +55,11 @@ app.post("/signin", async (req, res) => {
         isPasswordValid = await bcrypt.compare(password, user.password);
         if(isPasswordValid){
             //create a JWT token 
-            const token = await jwt.sign({_id : user._id}, "Anurag@123$");
+            const token = await jwt.sign({_id : user._id}, "Anurag@123$", {expiresIn:"1d"});
 
             //add the token into cookie and send the response back to the user
 
-            res.cookie("token" , token)
+            res.cookie("token" , token ,{expires: new Date(Date.now() + 1 * 3600000)}); //cookie expires in 1 hour
         
             res.send("Login sucessfully !!!")
         }
@@ -77,27 +77,8 @@ app.post("/signin", async (req, res) => {
 app.get("/profile", userAuth, async (req, res) => {
 
   try{  
-    
-  const cookies = req.cookies ;
 
-  // extract token from cookies
-  const {token} = cookies;
-
-  if(!token){
-    throw new Error("Invalid token");
-  }
-
-  //validate this token 
-
-  const decodedMessage = await jwt.verify(token ,"Anurag@123$" );
-
-  const {_id} = decodedMessage;
-
-  const user = await User.findById(_id);
-
-  if(!user){
-    throw new Error("User doesn't exist"); 
-  }
+  const user = req.user;
 
   res.send("User Profile" + user); 
   }
@@ -213,6 +194,16 @@ app.delete("/user", async (req, res) => {
     res.status(400).send("Something went wrong");
   }
 });
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+    
+  const user = req.user;
+
+  //sending a connection request 
+    console.log("Sending connection request");
+
+    res.send(user.firstName + " has sent the connection Request")
+} )
 
 connectDB()
   .then(() => {
