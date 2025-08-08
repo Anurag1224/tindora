@@ -66,6 +66,12 @@ const userSchema = new mongoose.Schema(
     about: {
       type: String,
       default: "This is a default user ",
+      validate: {
+        validator: function (str) {
+        return str.length <= 100;
+      },
+      message: "About should be less than 100 words"
+      }
     },
     skills: {
       type: [String],
