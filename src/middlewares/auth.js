@@ -7,7 +7,7 @@ try{
     //Read the token
   const {token} = req.cookies;
   if(!token) {
-    throw new Error("Invaid Token")
+    return res.status(401).send("Please Login !")
   }
 
   const decodedObj = await jwt.verify(token, "Anurag@123$");
