@@ -60,12 +60,14 @@ const userSchema = new mongoose.Schema(
       // },
     },
     photoUrl: {
-      type: String,
-      default: "geographyandyou.com/images/user-profile.png",
+      type: [String],
+      default: ["https://i.pinimg.com/1200x/cc/ef/70/ccef70e1f67357edd659be8d1da6813e.jpg"],
       validate(value) {
-        if (!validator.isURL(value)) {
-          throw new Error("Invalid Photo URL" + value);
-        }
+          value.forEach(url => {
+            if (!validator.isURL(url)) {
+              throw new Error("Invalid Photo URL: " + url);
+             }
+          });
       },
     },
     about: {
