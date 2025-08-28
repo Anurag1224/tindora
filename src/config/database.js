@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
+  console.log(process.env.DB_CONNECTION_STRING)
+
   await mongoose.connect(
-    "mongodb+srv://anurag1224kumar:8SaR5im1U7mDPP6I@backend.ipeafqb.mongodb.net/tindora"
+    process.env.DB_CONNECTION_STRING
   );
 };
 
