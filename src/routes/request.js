@@ -49,16 +49,21 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
-
       if (status == "interested") {
-        const emailRes = await sendEmail.run("A new friend request from " + req.user.firstName, req.user.firstName + " is " + status + " in " + toUser.firstName);
+        const emailRes = await sendEmail.run(
+          "A new friend request from " + req.user.firstName,
+          req.user.firstName + " is " + status + " in " + toUser.firstName
+        );
         res.json({
           message:
             req.user.firstName + " is " + status + " in " + toUser.firstName,
           data,
         });
       } else if (status == "ignored") {
-        const emailRes = await sendEmail.run("A new friend request from " + req.user.firstName, req.user.firstName + " " + status + " " + toUser.firstName);
+        const emailRes = await sendEmail.run(
+          "A new friend request from " + req.user.firstName,
+          req.user.firstName + " " + status + " " + toUser.firstName
+        );
         res.json({
           message: req.user.firstName + " " + status + " " + toUser.firstName,
           data,

@@ -48,26 +48,28 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       lowercase: true,
-       enum : {
+      enum: {
         values: ["male", "female", "others"],
-        message: "{VALUE} is not a valid gender type"
+        message: "{VALUE} is not a valid gender type",
       },
       // validate(value) {
       //   if (!["male", "female", "others"].includes(value)) {
       //     throw new Error("Gender data not valid");
       //   }
-     
+
       // },
     },
     photoUrl: {
       type: [String],
-      default: ["https://i.pinimg.com/1200x/cc/ef/70/ccef70e1f67357edd659be8d1da6813e.jpg"],
+      default: [
+        "https://i.pinimg.com/1200x/cc/ef/70/ccef70e1f67357edd659be8d1da6813e.jpg",
+      ],
       validate(value) {
-          value.forEach(url => {
-            if (!validator.isURL(url)) {
-              throw new Error("Invalid Photo URL: " + url);
-             }
-          });
+        value.forEach((url) => {
+          if (!validator.isURL(url)) {
+            throw new Error("Invalid Photo URL: " + url);
+          }
+        });
       },
     },
     about: {
@@ -75,10 +77,10 @@ const userSchema = new mongoose.Schema(
       default: "This is a default user ",
       validate: {
         validator: function (str) {
-        return str.length <= 100;
+          return str.length <= 100;
+        },
+        message: "About should be less than 100 words",
       },
-      message: "About should be less than 100 words"
-      }
     },
     skills: {
       type: [String],

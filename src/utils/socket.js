@@ -2,11 +2,13 @@ const socket = require("socket.io");
 const crypto = require("crypto");
 
 const getSecretRoomId = (userId, targetUserId) => {
-    return crypto.createHash("sha256").update([userId, targetUserId].sort().join("$")).digest("hex");
+  return crypto
+    .createHash("sha256")
+    .update([userId, targetUserId].sort().join("$"))
+    .digest("hex");
 };
 
 const initializeSocket = (server) => {
-
   const io = socket(server, {
     cors: {
       origin: "http://localhost:5173",
@@ -14,9 +16,7 @@ const initializeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-
     socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
-
       const roomId = getSecretRoomId(userId, targetUserId);
 
       console.log(firstName + " Joined room : " + roomId);
@@ -26,21 +26,35 @@ const initializeSocket = (server) => {
 
     socket.on(
       "sendMessage",
-      ({ firstName, userId, targetUserId, text }) => {
+      async ({ firstName, userId, targetUserId, text }) => {
+        try {
+          const roomId = getSecretRoomId(userId, targetUserId);
 
-        const roomId = getSecretRoomId(userId, targetUserId);
+          console.log(firstName + " " + text);
 
-        console.log(firstName + " " + text);
+          //logic to save message in db can be added here
+          let chat = chat.findOne({
+            participants: { $all: [userId, targetUserId] },
+          });
 
-        //logic to save message in db can be added here
-        try{
+          if (!chat) {
+            const chat = new chat({
+              participants: [userId, targetUserId],
+              messages: [],
+            });
 
-        }
-        catch(err) {
+            chat.messages.push({
+              senderId: userId,
+              text,
+            });
+
+            await chat.save();
+
+            io.to(roomId).emit("messageReceived", { firstName, text });
+          }
+        } catch (err) {
           console.error("Error saving message to DB:", err);
         }
-
-        io.to(roomId).emit("messageReceived",{firstName ,text});
       }
     );
 
