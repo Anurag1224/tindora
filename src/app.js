@@ -5,7 +5,9 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const cors = require("cors");
 require('dotenv').config();
-
+require("./utils/cronJob");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
 
 app.use(cors({
   origin : "http://localhost:5173", 
@@ -24,11 +26,14 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
+
 connectDB()
   .then(() => {
     console.log("Database connection established.....");
 
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("My server is sucessfully listening on port 7777...");
     });
   })
