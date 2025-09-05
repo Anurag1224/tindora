@@ -1,5 +1,7 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
+const { Chat } = require("../models/chat");
+const ConnectionRequest = require("../models/connectionRequest");
 
 const getSecretRoomId = (userId, targetUserId) => {
   return crypto
@@ -26,32 +28,55 @@ const initializeSocket = (server) => {
 
     socket.on(
       "sendMessage",
-      async ({ firstName, userId, targetUserId, text }) => {
+      async ({ firstName, lastName, userId, targetUserId, text }) => {
         try {
           const roomId = getSecretRoomId(userId, targetUserId);
+
+          //check if both users are friends or not
+
+          const isConnectedUserFriend = await ConnectionRequest.findOne({
+            $or: [
+              {
+                fromUserId: userId,
+                toUserId: targetUserId,
+                status: "accepted",
+              },
+              {
+                fromUserId: targetUserId,
+                toUserId: userId,
+                status: "accepted",
+              },
+            ],
+          });
+
+          if (!isConnectedUserFriend) {
+            console.log("Users are not friends. Message not sent.");
+            return;
+          }
 
           console.log(firstName + " " + text);
 
           //logic to save message in db can be added here
-          let chat = chat.findOne({
+          let chat = await Chat.findOne({
             participants: { $all: [userId, targetUserId] },
           });
 
           if (!chat) {
-            const chat = new chat({
+            chat = new Chat({
               participants: [userId, targetUserId],
               messages: [],
             });
-
-            chat.messages.push({
-              senderId: userId,
-              text,
-            });
-
-            await chat.save();
-
-            io.to(roomId).emit("messageReceived", { firstName, text });
           }
+          chat?.messages?.push({
+            senderId: userId,
+            text,
+          });
+
+          console.log(firstName + " " + chat.messages);
+
+          io.to(roomId).emit("messageReceived", { firstName, lastName, text });
+
+          await chat.save();
         } catch (err) {
           console.error("Error saving message to DB:", err);
         }
