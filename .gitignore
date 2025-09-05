@@ -1,4 +1,3 @@
 node_modules
 Notes
 .env
-src\utils\cronJob.js
