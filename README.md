@@ -24,7 +24,8 @@ Backend server for the Tindora application — handles business logic, API route
 
 ## Demo / Live Site
 
-The frontend is hosted at [*Live Preview*](https://themiraclestreet.co.in) (production).  
+Live Preview - [*Live Preview*](http://56.228.35.105/login) (production). 
+
 The frontend repository is: [Frontend Repo](https://github.com/Anurag1224/tindora-UI ) 
 
 ---
